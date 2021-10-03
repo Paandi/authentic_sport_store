@@ -1,35 +1,27 @@
 import sqlite3
+from db import db
 
 
-class UserModel:
-    def __init__(self, _id, name, pwd):
-        self.id = _id
+class UserModel(db.Model):
+    __tablename__ = 'user'
+
+    id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String(80))
+    pwd = db.Column(db.String(80))
+
+    def __init__(self, name, pwd):
         self.name = name
         self.pwd = pwd
 
+    def save_to_db(self):
+        db.session.add(self)
+        db.session.commit()
+
     @classmethod
     def find_by_name(cls, name):
-        try:
-            connection = sqlite3.connect("C:\\Users\\dinesh.pandey1\\PycharmProjects\\authentic_sport_store\\data.db")
-            cursor = connection.cursor()
-            query = "select * from user where name = ?"
-            result = cursor.execute(query, (name,))
-            row = result.fetchone()
-            return row
-
-        except:
-            print("Error: Failed to connect with Database")
+        return cls.query.filter_by(name=name).first()
 
     @classmethod
     def find_by_id(cls, uid):
-        try:
-            connection = sqlite3.connect("C:\\Users\\dinesh.pandey1\\PycharmProjects\\authentic_sport_store\\data.db")
-            cursor = connection.cursor()
-            query = "select * from user where id = ?"
-            result = cursor.execute(query, (uid,))
-            row = result.fetchone()
-            return row
-
-        except:
-            print("Error: Failed to connect with Database")
+        return cls.query.filter_by(id=uid).first()
 
